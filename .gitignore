@@ -1,0 +1,24 @@
+# Ignore Python virtual environment
+env/
+venv/
+.venv/
+
+# Ignore compiled Python files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Ignore system files
+.DS_Store
+
+# Ignore environment/config files
+*.env
+.envrc
+
+# Ignore stock chart images
+stock_charts/*.png
+
+# Optionally ignore log or temp files
+*.log
+*.tmp
