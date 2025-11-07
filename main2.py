@@ -113,6 +113,56 @@ def generate_stock_charts(symbols, period='6mo', save_dir='stock_charts'):
             print(f'Error processing {symbol} ({formatted_symbol}): {str(e)}')
 
 # Example usage
-symbols = ['QS']
+symbols = [
+  1310,
+  2573,
+  3626,
+  8007,
+  1693,
+  2312,
+  2350,
+  8401,
+  1715,
+  7841,
+  94,
+  1664,
+  2440,
+  8137,
+  1529,
+  1726,
+  205,
+  6877,
+  1948,
+  1920,
+  1728,
+  1788,
+  8087,
+  8500,
+  6128,
+  204,
+  2699,
+  2974,
+  2550,
+  1143,
+  620,
+  243,
+  381,
+  720,
+  476,
+  1159,
+  2159,
+  2503,
+  1991,
+  1025,
+  8050,
+  2569,
+  2566,
+  2610,
+  2629,
+  2597,
+  613,
+  770,
+  2340
+]
 # symbols = ['JOE','ACM','AMRX'，'ENS']  # Mix of US and HK stocks
-generate_stock_charts(symbols)
+generate_stock_charts(symbols,period='1y')
