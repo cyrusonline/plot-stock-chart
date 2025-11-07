@@ -5,39 +5,20 @@ import os
 from datetime import datetime, timedelta
 
 def format_stock_symbol(symbol):
-    """
-    Format stock symbol to proper format
-    - For HK stocks: Convert numbers like "700" to "0700.HK"
-    - For US stocks: Return as is
-    """
-    # Check if it's a number (potential HK stock)
     try:
         number = int(symbol)
-        # If it's likely a HK stock (usually 1-4 digits)
         if number < 10000:
             return f"{number:04d}.HK"
         return symbol
     except ValueError:
-        # If it already has .HK suffix, return as is
         if '.HK' in symbol.upper():
             return symbol.upper()
         return symbol
 
 def generate_stock_charts(symbols, period='6mo', save_dir='stock_charts'):
-    """
-    Generate stock charts with candlesticks and SMAs
-    
-    Parameters:
-    symbols (list): List of stock symbols (e.g., ['AAPL', '700', '9988'])
-    period (str): Time period ('1mo', '6mo', '1y', etc.)
-    save_dir (str): Directory to save the charts
-    """
-    
-    # Create output directory if it doesn't exist
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
     
-    # Style configuration for dark theme
     mc = mpf.make_marketcolors(up='#26A69A',
                               down='#EF5350',
                               edge='inherit',
@@ -56,10 +37,7 @@ def generate_stock_charts(symbols, period='6mo', save_dir='stock_charts'):
     
     for symbol in symbols:
         try:
-            # Format the symbol
             formatted_symbol = format_stock_symbol(symbol)
-            
-            # Download data
             stock = yf.Ticker(formatted_symbol)
             df = stock.history(period=period)
             
@@ -67,23 +45,19 @@ def generate_stock_charts(symbols, period='6mo', save_dir='stock_charts'):
                 print(f"No data found for {formatted_symbol}")
                 continue
                 
-            # Calculate SMAs
             df['SMA10'] = df['Close'].rolling(window=10).mean()
             df['SMA20'] = df['Close'].rolling(window=20).mean()
             
-            # Get company name (if available)
             try:
                 company_name = stock.info.get('longName', formatted_symbol)
             except:
                 company_name = formatted_symbol
             
-            # Create the plot
             apds = [
                 mpf.make_addplot(df['SMA10'], color='#42A5F5', width=1, label='10 SMA'),
                 mpf.make_addplot(df['SMA20'], color='#FF7043', width=1, label='20 SMA')
             ]
             
-            # Plot and save
             fig, axes = mpf.plot(df,
                                type='candle',
                                style=s,
@@ -94,17 +68,24 @@ def generate_stock_charts(symbols, period='6mo', save_dir='stock_charts'):
                                panel_ratios=(2, 0.5),
                                returnfig=True)
             
-            # Adjust title color and add legend
-            axes[0].set_title(f'{company_name} ({formatted_symbol})', color='white')
+            # Set title and axis labels to white
+            axes[0].set_title(f'{company_name} ({formatted_symbol})', color='white', pad=20)
             
-            # Create legend with correct parameters
+            # Set axis labels and tick colors to white for both price and volume panels
+            for ax in axes:
+                ax.set_ylabel(ax.get_ylabel(), color='white')
+                ax.set_xlabel(ax.get_xlabel(), color='white')
+                ax.tick_params(colors='white')
+                for spine in ax.spines.values():
+                    spine.set_color('white')
+            
+            # Create legend with white text
             legend = axes[0].legend(['10 SMA', '20 SMA'])
             legend.get_frame().set_facecolor('#1E1E1E')
             legend.get_frame().set_edgecolor('#3E3E3E')
             for text in legend.get_texts():
                 text.set_color('white')
             
-            # Save the plot
             filename = f'{save_dir}/{formatted_symbol}_{datetime.now().strftime("%Y%m%d")}.png'
             fig.savefig(filename, dpi=300, bbox_inches='tight', facecolor='#1E1E1E')
             print(f'Chart saved: {filename}')
@@ -113,6 +94,5 @@ def generate_stock_charts(symbols, period='6mo', save_dir='stock_charts'):
             print(f'Error processing {symbol} ({formatted_symbol}): {str(e)}')
 
 # Example usage
-symbols = [6162,1660]
-# symbols = ['JOE','ACM','AMRX'，'ENS']  # Mix of US and HK stocks
+symbols = [1645,'NVDA',6162, 1660]
 generate_stock_charts(symbols)
